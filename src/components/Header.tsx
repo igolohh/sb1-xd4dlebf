@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
-import { LogOut, Menu, X, Key, Github } from 'lucide-react';
+import { LogOut, Menu, X, Key } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
 import { useAuth } from '../contexts/AuthContext';
 import { getEmployeeName } from '../utils/employeeUtils';
 import ChangePasswordModal from './ChangePasswordModal';
-import GitHubModal from './GitHubModal';
 
 const Header: React.FC = () => {
   const { userRole } = useApp();
   const { signOut, user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
-  const [showGitHubModal, setShowGitHubModal] = useState(false);
 
   const employeeName = user?.email ? getEmployeeName(user.email) : '';
 
@@ -35,13 +33,6 @@ const Header: React.FC = () => {
                   {userRole === 'kepalaSatker' ? 'Kepala Satker' : 'Pegawai'}
                 </span>
               </div>
-              <button
-                onClick={() => setShowGitHubModal(true)}
-                className="flex items-center px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
-              >
-                <Github className="h-4 w-4 mr-2" />
-                GitHub
-              </button>
               <button
                 onClick={() => setShowChangePassword(true)}
                 className="flex items-center px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
@@ -80,16 +71,6 @@ const Header: React.FC = () => {
               </div>
               <button
                 onClick={() => {
-                  setShowGitHubModal(true);
-                  setIsMenuOpen(false);
-                }}
-                className="flex items-center w-full px-4 py-2 text-gray-300 hover:bg-gray-800"
-              >
-                <Github className="h-4 w-4 mr-2" />
-                GitHub
-              </button>
-              <button
-                onClick={() => {
                   setShowChangePassword(true);
                   setIsMenuOpen(false);
                 }}
@@ -112,10 +93,6 @@ const Header: React.FC = () => {
 
       {showChangePassword && (
         <ChangePasswordModal onClose={() => setShowChangePassword(false)} />
-      )}
-
-      {showGitHubModal && (
-        <GitHubModal onClose={() => setShowGitHubModal(false)} />
       )}
     </>
   );
