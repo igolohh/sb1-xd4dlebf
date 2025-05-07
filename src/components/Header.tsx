@@ -19,10 +19,11 @@ const Header: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-              <div className="text-white">
-                <h1 className="text-xl font-bold">PEKA</h1>
-                <p className="text-sm text-gray-400">Penilaian Kinerja Harian</p>
-              </div>
+              <img
+                src="/logo.png"
+                alt="BPS Logo"
+                className="h-14 w-35 mr-3"
+              />
             </div>
 
             {/* Desktop Menu */}

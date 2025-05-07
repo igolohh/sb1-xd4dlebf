@@ -1,108 +1,102 @@
 import React, { useState } from 'react';
+import { LogOut, Menu, X, Key } from 'lucide-react';
+import { useApp } from '../contexts/AppContext';
 import { useAuth } from '../contexts/AuthContext';
-import { Eye, EyeOff } from 'lucide-react';
+import { getEmployeeName } from '../utils/employeeUtils';
+import ChangePasswordModal from './ChangePasswordModal';
 
-const LoginPage: React.FC = () => {
-  const { signIn, error } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+const Header: React.FC = () => {
+  const { userRole } = useApp();
+  const { signOut, user } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      await signIn(email, password);
-    } catch (error) {
-      console.error('Authentication error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const employeeName = user?.email ? getEmployeeName(user.email) : '';
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-white mb-2">PEKA</h1>
-          <p className="text-gray-400 text-lg">Penilaian Kinerja Harian</p>
-        </div>
+    <>
+      <header className="bg-gray-900 border-b border-gray-800">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center">
+              <img
+                src="/logo.png"
+                alt="BPS Logo"
+                className="h-14 w-35 mr-3"
+              />
+            </div>
 
-        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
-                  {error}
-                </div>
-              )}
-
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                  Email
-                </label>
-                <div className="mt-1">
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
+            {/* Desktop Menu */}
+            <nav className="hidden md:flex items-center space-x-6">
+              <div className="flex flex-col items-end">
+                <span className="text-sm font-medium text-gray-200">{employeeName}</span>
+                <span className="text-xs text-gray-400">
+                  {userRole === 'kepalaSatker' ? 'Kepala Satker' : 'Pegawai'}
+                </span>
               </div>
+              <button
+                onClick={() => setShowChangePassword(true)}
+                className="flex items-center px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                <Key className="h-4 w-4 mr-2" />
+                Ganti Password
+              </button>
+              <button
+                onClick={() => signOut()}
+                className="flex items-center px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Keluar
+              </button>
+            </nav>
 
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                  Password
-                </label>
-                <div className="mt-1 relative">
-                  <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    autoComplete="current-password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5" />
-                    ) : (
-                      <Eye className="h-5 w-5" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                    loading ? 'opacity-75 cursor-not-allowed' : ''
-                  }`}
-                >
-                  {loading ? 'Memproses...' : 'Masuk'}
-                </button>
-              </div>
-            </form>
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="p-2 rounded-lg hover:bg-gray-800 transition-colors text-gray-300"
+              >
+                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
+            </div>
           </div>
+
+          {/* Mobile Menu */}
+          {isMenuOpen && (
+            <div className="md:hidden py-4 border-t border-gray-800 space-y-4">
+              <div className="px-4 py-2">
+                <div className="text-sm font-medium text-gray-200">{employeeName}</div>
+                <div className="text-xs text-gray-400">
+                  {userRole === 'kepalaSatker' ? 'Kepala Satker' : 'Pegawai'}
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setShowChangePassword(true);
+                  setIsMenuOpen(false);
+                }}
+                className="flex items-center w-full px-4 py-2 text-gray-300 hover:bg-gray-800"
+              >
+                <Key className="h-4 w-4 mr-2" />
+                Ganti Password
+              </button>
+              <button
+                onClick={() => signOut()}
+                className="flex items-center w-full px-4 py-2 text-gray-300 hover:bg-gray-800"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Keluar
+              </button>
+            </div>
+          )}
         </div>
-      </div>
-    </div>
+      </header>
+
+      {showChangePassword && (
+        <ChangePasswordModal onClose={() => setShowChangePassword(false)} />
+      )}
+    </>
   );
 };
 
-export default LoginPage;
+export default Header;
