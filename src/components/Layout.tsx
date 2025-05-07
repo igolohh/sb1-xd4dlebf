@@ -44,15 +44,19 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, isActive, onClic
 const FAQ_ITEMS = [
   {
     question: "Bagaimana cara menambah entri pekerjaan?",
-    answer: "Isi formulir entri pekerjaan baru dengan judul, deskripsi, dan tanggal pekerjaan, kemudian klik tombol 'Simpan Entri Pekerjaan'."
+    answer: "1. Pilih menu 'Entri Pekerjaan'\n2. Isi tanggal pekerjaan\n3. Isi uraian pekerjaan\n4. Isi satuan (misal: Dokumen, Laporan)\n5. Isi jumlah realisasi\n6. Klik tombol 'Simpan Entri Pekerjaan'"
   },
   {
-    question: "Bagaimana status persetujuan?",
-    answer: "Ada 3 status: Menunggu Persetujuan (kuning), Disetujui (hijau), dan Ditolak (merah). Kepala Satker akan meninjau dan memutuskan status entri."
+    question: "Apa saja status persetujuan yang ada?",
+    answer: "Ada 3 status:\n- Menunggu Persetujuan (kuning): Entri baru yang belum ditinjau\n- Disetujui (hijau): Entri yang telah disetujui Kepala\n- Ditolak (merah): Entri yang ditolak dengan alasan tertentu"
   },
   {
-    question: "Bisakah menghapus entri?",
-    answer: "Ya, entri dapat dihapus jika statusnya masih 'Menunggu Persetujuan' atau 'Ditolak'. Entri yang sudah disetujui tidak dapat dihapus."
+    question: "Kapan saya bisa menghapus entri?",
+    answer: "Entri hanya dapat dihapus jika:\n1. Status masih 'Menunggu Persetujuan'\n2. Status 'Ditolak'\n\nEntri yang sudah disetujui tidak dapat dihapus."
+  },
+  {
+    question: "Bagaimana cara melihat riwayat pekerjaan?",
+    answer: "1. Buka menu 'Pekerjaan Bulan Ini'\n2. Gunakan filter bulan untuk melihat periode tertentu\n3. Gunakan pencarian untuk menemukan pekerjaan spesifik\n4. Klik pada entri untuk melihat detail lengkap"
   }
 ];
 
@@ -62,7 +66,6 @@ const Layout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showFAQ, setShowFAQ] = useState(false);
 
-  // Handle menu click with view persistence
   const handleMenuClick = (view: string) => {
     setCurrentView(view);
     saveLastView(view);
@@ -70,7 +73,6 @@ const Layout: React.FC = () => {
     setIsSidebarOpen(false);
   };
 
-  // Close sidebar when clicking outside on both mobile and desktop
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const sidebar = document.getElementById('sidebar');
@@ -93,7 +95,6 @@ const Layout: React.FC = () => {
       <Header />
       
       <div className="flex-grow flex relative">
-        {/* Floating Sidebar Toggle Button */}
         <button
           id="sidebar-toggle"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -102,7 +103,6 @@ const Layout: React.FC = () => {
           {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
 
-        {/* Floating Sidebar */}
         <div
           id="sidebar"
           className={`fixed inset-y-0 left-0 z-40 w-[280px] transform 
@@ -166,7 +166,6 @@ const Layout: React.FC = () => {
                 </>
               )}
               
-              {/* FAQ Menu Item */}
               <SidebarItem
                 icon={<HelpCircle className="h-5 w-5" />}
                 label="FAQ"
@@ -183,7 +182,6 @@ const Layout: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Content */}
         <main className="flex-1 p-8 overflow-auto">
           <div className="max-w-7xl mx-auto">
             {showFAQ ? (
@@ -193,7 +191,7 @@ const Layout: React.FC = () => {
                   {FAQ_ITEMS.map((item, index) => (
                     <div key={index} className="border-b border-gray-100 pb-4 last:border-0">
                       <h3 className="font-medium text-gray-900 mb-2">{item.question}</h3>
-                      <p className="text-gray-600">{item.answer}</p>
+                      <p className="text-gray-600 whitespace-pre-line">{item.answer}</p>
                     </div>
                   ))}
                 </div>
@@ -207,7 +205,6 @@ const Layout: React.FC = () => {
       
       <Footer />
 
-      {/* Overlay for mobile sidebar */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30"
