@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, CheckCircle, XCircle, Calendar, Clock, User } from 'lucide-react';
+import { X, CheckCircle, XCircle, Calendar, Clock, User, Building2, Briefcase } from 'lucide-react';
 import { WorkEntry, useApp } from '../contexts/AppContext';
 import { formatDateTime, formatStatusBadge } from '../utils/dateUtils';
 import { getEmployeeName } from '../utils/employeeUtils';
@@ -72,9 +72,29 @@ const EntryModal: React.FC<EntryModalProps> = ({ entry, isApprover, onClose }) =
                 <Clock className="h-4 w-4 mr-1" />
                 <span>{formatDateTime(entry.waktuSubmit)}</span>
               </div>
-              <div className="flex items-center text-gray-600">
-                <User className="h-4 w-4 mr-1" />
-                <span>{employeeName}</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 bg-gray-50 p-4 rounded-lg">
+              <div className="flex items-center text-gray-700">
+                <User className="h-4 w-4 mr-2 text-gray-500" />
+                <div>
+                  <span className="text-sm font-medium">Pegawai:</span>
+                  <p>{employeeName}</p>
+                </div>
+              </div>
+              <div className="flex items-center text-gray-700">
+                <Building2 className="h-4 w-4 mr-2 text-gray-500" />
+                <div>
+                  <span className="text-sm font-medium">Departemen:</span>
+                  <p>{entry.department}</p>
+                </div>
+              </div>
+              <div className="flex items-center text-gray-700 md:col-span-2">
+                <Briefcase className="h-4 w-4 mr-2 text-gray-500" />
+                <div>
+                  <span className="text-sm font-medium">Jabatan:</span>
+                  <p>{entry.position}</p>
+                </div>
               </div>
             </div>
             

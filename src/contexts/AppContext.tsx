@@ -60,7 +60,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [filterDepartment, setFilterDepartment] = useState('semua');
   const [currentMonth, setCurrentMonth] = useState(formatDate(new Date()).substring(0, 7));
 
-  // Determine user role based on email
   const userRole = user?.email === 'christo.erie@bps.go.id' ? 'kepalaSatker' : 'pegawai';
 
   const fetchEntries = async () => {
@@ -70,7 +69,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         .select('*')
         .order('waktu_submit', { ascending: false });
 
-      // Filter by month if specified
       if (currentMonth) {
         const startDate = `${currentMonth}-01`;
         const [year, month] = currentMonth.split('-').map(Number);
@@ -82,12 +80,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           .lte('tanggal', endDate);
       }
 
-      // Filter by department if specified
       if (filterDepartment !== 'semua') {
         query = query.eq('department', filterDepartment);
       }
 
-      // For regular employees, only show their own entries
       if (userRole === 'pegawai' && user?.email) {
         const username = user.email.split('@')[0];
         query = query.eq('pegawai', username);
@@ -100,7 +96,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return;
       }
 
-      // Transform the data to match our WorkEntry interface
       const transformedEntries = data.map(entry => ({
         id: entry.id,
         tanggal: entry.tanggal,
@@ -121,7 +116,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  // Initial fetch and setup realtime subscription
   useEffect(() => {
     fetchEntries();
 
@@ -145,34 +139,58 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [currentMonth, filterDepartment, user?.email]);
 
   const addEntry = async (entry: Omit<WorkEntry, 'id' | 'status' | 'waktuSubmit'>) => {
-    const { error } = await supabase.from('work_entries').insert([{
+    const { data, error } = await supabase.from('work_entries').insert([{
       pegawai: entry.pegawai,
       judul: entry.judul,
       deskripsi: entry.deskripsi,
       tanggal: entry.tanggal,
       department: entry.department,
       position: entry.position,
-    }]);
+    }]).select();
 
     if (error) {
       console.error('Error adding entry:', error);
       throw error;
     }
+
+    // Immediately update local state
+    if (data) {
+      setEntries(prevEntries => [data[0], ...prevEntries]);
+    }
   };
 
   const approveEntry = async (id: string, approved: boolean, komentar?: string) => {
-    const { error } = await supabase
+    const updateData = {
+      status: approved ? 'disetujui' : 'ditolak',
+      komentar: komentar,
+      tanggal_persetujuan: formatDate(new Date()),
+    };
+
+    const { data, error } = await supabase
       .from('work_entries')
-      .update({
-        status: approved ? 'disetujui' : 'ditolak',
-        komentar: komentar,
-        tanggal_persetujuan: formatDate(new Date()),
-      })
-      .eq('id', id);
+      .update(updateData)
+      .eq('id', id)
+      .select();
 
     if (error) {
       console.error('Error updating entry:', error);
       throw error;
+    }
+
+    // Immediately update local state
+    if (data) {
+      setEntries(prevEntries =>
+        prevEntries.map(entry =>
+          entry.id === id
+            ? {
+                ...entry,
+                status: updateData.status,
+                komentar: updateData.komentar,
+                tanggalPersetujuan: updateData.tanggal_persetujuan,
+              }
+            : entry
+        )
+      );
     }
   };
 
@@ -186,6 +204,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       console.error('Error deleting entry:', error);
       throw error;
     }
+
+    // Immediately update local state
+    setEntries(prevEntries => prevEntries.filter(entry => entry.id !== id));
   };
 
   return (

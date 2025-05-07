@@ -14,7 +14,8 @@ const EntryForm: React.FC = () => {
   const [formData, setFormData] = useState({
     pegawai: username,
     judul: '',
-    deskripsi: '',
+    satuan: '',
+    realisasi: '',
     tanggal: formatDate(new Date()),
     department: userDepartment,
     position: userPosition,
@@ -32,19 +33,23 @@ const EntryForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.pegawai || !formData.judul || !formData.deskripsi) {
+    if (!formData.pegawai || !formData.judul || !formData.satuan || !formData.realisasi) {
       return;
     }
     
     setIsSubmitting(true);
     
     try {
-      await addEntry(formData);
+      await addEntry({
+        ...formData,
+        deskripsi: `Satuan: ${formData.satuan}\nRealisasi: ${formData.realisasi}`,
+      });
       
       setFormData({
         ...formData,
         judul: '',
-        deskripsi: '',
+        satuan: '',
+        realisasi: '',
         tanggal: formatDate(new Date()),
       });
       
@@ -85,7 +90,7 @@ const EntryForm: React.FC = () => {
       
       <div>
         <label htmlFor="judul" className="block text-sm font-medium text-gray-700 mb-1">
-          Judul Pekerjaan
+          Uraian Pekerjaan
         </label>
         <input
           type="text"
@@ -97,20 +102,40 @@ const EntryForm: React.FC = () => {
           required
         />
       </div>
-      
-      <div>
-        <label htmlFor="deskripsi" className="block text-sm font-medium text-gray-700 mb-1">
-          Deskripsi Pekerjaan
-        </label>
-        <textarea
-          id="deskripsi"
-          name="deskripsi"
-          value={formData.deskripsi}
-          onChange={handleChange}
-          rows={4}
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          required
-        />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="satuan" className="block text-sm font-medium text-gray-700 mb-1">
+            Satuan
+          </label>
+          <input
+            type="text"
+            id="satuan"
+            name="satuan"
+            value={formData.satuan}
+            onChange={handleChange}
+            placeholder="Contoh: Dokumen, Laporan, Kegiatan"
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            required
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="realisasi" className="block text-sm font-medium text-gray-700 mb-1">
+            Realisasi
+          </label>
+          <input
+            type="number"
+            id="realisasi"
+            name="realisasi"
+            value={formData.realisasi}
+            onChange={handleChange}
+            min="1"
+            placeholder="Jumlah realisasi"
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            required
+          />
+        </div>
       </div>
 
       {/* Hidden fields for fixed values */}

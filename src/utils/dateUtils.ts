@@ -6,14 +6,23 @@ export const formatDate = (date: Date): string => {
 };
 
 export const formatDateTime = (isoString: string): string => {
-  const date = new Date(isoString);
-  return new Intl.DateTimeFormat('id-ID', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  }).format(date);
+  try {
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) {
+      console.warn(`Invalid date string received: ${isoString}`);
+      return 'Tanggal tidak valid';
+    }
+    return new Intl.DateTimeFormat('id-ID', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date);
+  } catch (error) {
+    console.error("Error formatting date:", error);
+    return 'Tanggal tidak valid';
+  }
 };
 
 export const formatStatusBadge = (status: string): {

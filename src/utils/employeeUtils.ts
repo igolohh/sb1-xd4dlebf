@@ -63,7 +63,8 @@ const employeePositionMap: Record<string, string> = {
   'anzilna.luthfa': 'Statistisi Ahli Pertama',
   'shania.nendisa': 'Statistisi Pelaksana',
   'vanny.satumalay': 'Kasubag',
-  'irawan.ghazali': 'Statistisi Ahli Pertama'
+  'irawan.ghazali': 'Statistisi Ahli Pertama',
+  'christo.erie': 'Statistisi Ahli Muda'
 };
 
 export const getEmployeeName = (email: string): string => {
@@ -80,3 +81,5 @@ export const getEmployeePosition = (email: string): string => {
   const username = email.split('@')[0];
   return employeePositionMap[username] || 'Statistisi Pelaksana';
 };
+
+export { employeeNameMap };
